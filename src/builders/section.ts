@@ -80,15 +80,67 @@ export class SectionBuilder {
   }
 
   public getSectionText(section: RefinedSectionData, translate: string, rotate: string) {
-    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-    txt.setAttribute('transform', translate + rotate)
-    txt.setAttribute('text-anchor', 'middle')
-    txt.setAttribute('dominant-baseline', 'middle')
-    txt.setAttribute('fill', section.font_color)
-    txt.setAttribute('font-family', section.font)
-    txt.setAttribute('font-size', section.font_size.toString())
-    txt.textContent = section.value
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('transform', translate + rotate);
+    txt.setAttribute('text-anchor', 'start');
+    txt.setAttribute('dominant-baseline', 'middel');
+    txt.setAttribute('fill', section.font_color);
+    txt.setAttribute('font-family', section.font);
+    txt.setAttribute('font-size', section.font_size.toString());
+    txt.setAttribute('x', '-40');
+    txt.setAttribute('y', '0');
+    txt.setAttribute('dy', '0');
 
-    return txt
+
+
+    if(section.value.length > 10){
+        const values = this.splitByWord(section.value, 10);
+        let count = 0;
+        for(const value of values){
+            const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+            tspan.setAttribute('transform', translate + rotate);
+            tspan.setAttribute('text-anchor', 'start');
+            tspan.setAttribute('dominant-baseline', 'middel');
+            tspan.setAttribute('fill', section.font_color);
+            tspan.setAttribute('font-family', section.font);
+            tspan.setAttribute('font-size', section.font_size.toString());
+            tspan.setAttribute('x', '-40');
+
+            if(count){
+                tspan.setAttribute('dy', '20');
+            }
+            count++;
+
+            tspan.textContent = value;
+
+            txt.appendChild(tspan);
+        }
+    }
+    else{
+        txt.textContent = section.value;
+    }
+    return txt;
+
+  }
+
+  public splitByWord(text: string, length: number) {
+    const words = text.split(/\s+/); // Split the text into words
+    const lines = [];
+    let currentLine = "";
+  
+    for (const word of words) {
+      if (currentLine.length + word.length + 1 <= length) {
+        currentLine += word + " ";
+      } else {
+        lines.push(currentLine.trim());
+        currentLine = word + " ";
+      }
+    }
+  
+    if (currentLine.length > 0) {
+      lines.push(currentLine.trim());
+    }
+  
+    return lines;
   }
 }
